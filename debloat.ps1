@@ -160,9 +160,44 @@ if ($options["DisableRecall"]) {
     }
 }
 
+Write-Status "Updating Winget sources..."
+winget source update
+
 if ($options["RemoveOneDrive"]) {
     Write-Status "Removing OneDrive..."
-    winget uninstall "Microsoft.OneDrive" --accept-source-agreements
+
+    # Try to terminate OneDrive process if running
+    Get-Process -Name "OneDrive" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+
+    # Try multiple methods to uninstall OneDrive
+    try {
+        # Run the OneDrive uninstaller directly
+        if (Test-Path "$env:SystemRoot\SysWOW64\OneDriveSetup.exe") {
+            Write-Status "Running OneDrive uninstaller (64-bit)..."
+            & "$env:SystemRoot\SysWOW64\OneDriveSetup.exe" /uninstall
+        } elseif (Test-Path "$env:SystemRoot\System32\OneDriveSetup.exe") {
+            Write-Status "Running OneDrive uninstaller (32-bit)..."
+            & "$env:SystemRoot\System32\OneDriveSetup.exe" /uninstall
+        }
+
+        # Wait for the uninstaller to complete
+        Start-Sleep -Seconds 5
+
+        # Remove leftover OneDrive folder if it exists
+        if (Test-Path "$env:USERPROFILE\OneDrive") {
+            Write-Status "Removing OneDrive folder..."
+            Remove-Item -Path "$env:USERPROFILE\OneDrive" -Force -Recurse -ErrorAction SilentlyContinue
+        }
+
+        # Remove OneDrive from Explorer sidebar
+        Write-Status "Removing OneDrive from Explorer..."
+        Invoke-RegCommand 'reg add "HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f'
+        Invoke-RegCommand 'reg add "HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f'
+
+        Write-Status "OneDrive removal completed" -ForegroundColor Green
+    } catch {
+        Write-Status "Error removing OneDrive: $_" -ForegroundColor Red
+    }
 }
 
 if ($options["RemoveBingSearch"]) {
