@@ -27,7 +27,7 @@ function Test-Windows11 {
     Write-Status "Windows 11 detected - continuing with script"
 }
 
-function Test-AdminPrivileges {
+function Test-AdminPrivilege {
     $currentUser = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
     if (-not $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         Write-Status "This script requires administrator privileges. Please run as administrator." -ForegroundColor Red
@@ -52,10 +52,6 @@ function Invoke-RegCommand {
 # Script starts here
 ################################################################################
 
-# Get the ID and security principal of the current user account
-$myWindowsID=[System.Security.Principal.WindowsIdentity]::GetCurrent()
-$myWindowsPrincipal=new-object System.Security.Principal.WindowsPrincipal($myWindowsID)
-
 # Set script to stop on first error
 $ErrorActionPreference = "Stop"
 
@@ -67,7 +63,7 @@ Start-Transcript -Path $logFile -Force
 Test-Windows11
 
 # Check for admin privileges
-Test-AdminPrivileges
+Test-AdminPrivilege
 Write-Status "Administrator privileges confirmed"
 
 # Create a hashtable of debloat options - set to $true to enable
