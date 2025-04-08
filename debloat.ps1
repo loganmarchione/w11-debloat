@@ -1,4 +1,55 @@
-# Windows 11 Debloat Script (Optimized)
+################################################################################
+# Functions
+################################################################################
+function Write-Status {
+    param(
+        [string]$Message,
+        [System.ConsoleColor]$ForegroundColor = [System.ConsoleColor]::Cyan,
+        [System.ConsoleColor]$BackgroundColor = $Host.UI.RawUI.BackgroundColor
+    )
+    Write-Host "[$((Get-Date).ToString('HH:mm:ss'))] $Message" -ForegroundColor $ForegroundColor -BackgroundColor $BackgroundColor
+}
+
+function Test-Windows11 {
+    $info = [Environment]::OSVersion.Version
+    $Major = $info.Major
+    if ($info.Build -ge 22000) {
+        $Major = 11
+    }
+    $OSVersion = [System.Version]::new($Major, $info.Minor, $info.Build)
+    Write-Status ("Windows Version: {0}.{1}.{2}" -f $OSVersion.Major, $OSVersion.Minor, $OSVersion.Build) -ForegroundColor Yellow
+
+    if ($Major -lt 11) {
+        Write-Status "This script is designed for Windows 11. Current OS version: Windows $Major" -ForegroundColor Red
+        return $false
+    }
+    return $true
+}
+
+function Test-AdminPrivileges {
+    $currentUser = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+    if (-not $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        Write-Status "This script requires administrator privileges. Please run as administrator." -ForegroundColor Red
+        Exit 1
+    }
+}
+
+function Invoke-RegCommand {
+    param([string]$Command)
+    try {
+        Invoke-Expression "cmd /c $Command" | Out-Null
+        return $true
+    }
+    catch {
+        Write-Status "Error executing: $Command" -ForegroundColor Red
+        Write-Status $_.Exception.Message -ForegroundColor Red
+        return $false
+    }
+}
+
+################################################################################
+# Script starts here
+################################################################################
 
 # Get the ID and security principal of the current user account
 $myWindowsID=[System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -11,30 +62,10 @@ $ErrorActionPreference = "Stop"
 $logFile = "$env:USERPROFILE\Desktop\Windows11_Debloat_Log.txt"
 Start-Transcript -Path $logFile -Force
 
-function Write-Status {
-    param([string]$Message)
-    Write-Host "[$((Get-Date).ToString('HH:mm:ss'))] $Message" -ForegroundColor Cyan
-}
-
-function Test-AdminPrivileges {
-    $currentUser = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-    if (-not $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        Write-Host "This script requires administrator privileges. Please run as administrator." -ForegroundColor Red
-        Exit 1
-    }
-}
-
-function Invoke-RegCommand {
-    param([string]$Command)
-    try {
-        Invoke-Expression "cmd /c $Command" | Out-Null
-        return $true
-    }
-    catch {
-        Write-Host "Error executing: $Command" -ForegroundColor Red
-        Write-Host $_.Exception.Message -ForegroundColor Red
-        return $false
-    }
+# Check for Windows 11
+if (-not (Test-Windows11)) {
+    Write-Status "Exiting script as this is not Windows 11." -ForegroundColor Red
+    Exit 1
 }
 
 # Check for admin privileges
@@ -43,16 +74,15 @@ Write-Status "Administrator privileges confirmed"
 
 # Create a hashtable of debloat options - set to $true to enable
 $options = @{
-    # System
+    # System settings
     "SetRegion"                = $true   # Set region to US
-    "SetTimezone"              = $true   # Set timezone to Eastern (run `Get-TimeZone -ListAvailable` to see all)
+    "SetTimezone"              = $true   # Set timezone to Eastern
     "SetCulture"               = $true   # Set culture to en-US
     "DisableHibernation"       = $true   # Disable hibernation
-    "DisableRecall"            = $true   # Disable Recall feature
     "SetDateFormat"            = $true   # Set date format to yyyy-MM-dd
     "EnableDarkTheme"          = $true   # Enable dark theme
     
-    # Explorer
+    # Explorer settings
     "ShowFileExtensions"       = $true   # Show file extensions
     "ShowHiddenFiles"          = $true   # Show hidden files
     "HideSyncNotifications"    = $true   # Hide sync provider notifications
@@ -73,21 +103,21 @@ $options = @{
     "HideTaskViewButton"       = $true   # Hide Task View button
     
     # App Removal
+    "DisableRecall"            = $true   # Disable Recall feature
     "RemoveWidgets"            = $true   # Remove widgets
     "RemoveOneDrive"           = $true   # Remove OneDrive
     "RemoveBingSearch"         = $true   # Remove Bing Search
     "RemovePowerAutomate"      = $true   # Remove PowerAutomate
     "RemoveXboxApps"           = $true   # Remove Xbox apps
-    "RemoveCopilot"            = $true   # Remove Copilot
     "RemoveBloatware"          = $true   # Remove all bloatware
     
     # Final Action
     "RestartComputer"          = $false  # Restart computer when done
 }
 
-#################################################
-# SYSTEM SETTINGS
-#################################################
+########################################
+# System settings
+########################################
 if ($options["SetRegion"]) {
     Write-Status "Setting region to US..."
     Set-WinHomeLocation -GeoID 244
@@ -108,16 +138,6 @@ if ($options["DisableHibernation"]) {
     powercfg.exe /hibernate off
 }
 
-if ($options["DisableRecall"]) {
-    Write-Status "Disabling Recall feature..."
-    $RecallEnabled = Get-WindowsOptionalFeature -Online -FeatureName "Recall"
-    if ($RecallEnabled.State -eq "Enabled") {
-        Disable-WindowsOptionalFeature -FeatureName "Recall" -Online -NoRestart | Out-Null
-    } else {
-        Write-Status "Recall feature already disabled"
-    }
-}
-
 if ($options["SetDateFormat"]) {
     Write-Status "Setting date format to yyyy-MM-dd..."
     Set-ItemProperty -Path "HKCU:\Control Panel\International" -Name sShortDate -Value "yyyy-MM-dd"
@@ -129,9 +149,9 @@ if ($options["EnableDarkTheme"]) {
     Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d 0 /f'
 }
 
-#################################################
-# EXPLORER SETTINGS
-#################################################
+########################################
+# Explorer settings
+########################################
 if ($options["ShowFileExtensions"]) {
     Write-Status "Showing file extensions..."
     Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "HideFileExt" /t REG_DWORD /d 0 /f'
@@ -184,13 +204,13 @@ if ($options["RestoreContextMenu"]) {
         
         Write-Status "Classic context menu restored successfully."
     } catch {
-        Write-Host "Error restoring classic context menu: $_" -ForegroundColor Red
+        Write-Status "Error restoring classic context menu: $_" -ForegroundColor Red
     }
 }
 
-#################################################
-# START MENU SETTINGS
-#################################################
+########################################
+# Start Menu
+########################################
 if ($options["HideRecentlyAddedApps"]) {
     Write-Status "Hiding recently added apps..."
     Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "HideRecentlyAddedApps" /t REG_DWORD /d 1 /f'
@@ -206,9 +226,9 @@ if ($options["HideRecommendations"]) {
     Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_IrisRecommendations" /t REG_DWORD /d 0 /f'
 }
 
-#################################################
-# TASKBAR SETTINGS
-#################################################
+########################################
+# Taskbar
+########################################
 if ($options["AlignTaskbarLeft"]) {
     Write-Status "Aligning taskbar to the left..."
     Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarAl" /t REG_DWORD /d 0 /f'
@@ -224,12 +244,22 @@ if ($options["HideTaskViewButton"]) {
     Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t REG_DWORD /d 0 /f'
 }
 
-#################################################
-# APP REMOVAL
-#################################################
+########################################
+# App Removal
+########################################
+if ($options["DisableRecall"]) {
+    Write-Status "Disabling Recall feature..."
+    $RecallEnabled = Get-WindowsOptionalFeature -Online -FeatureName "Recall"
+    if ($RecallEnabled.State -eq "Enabled") {
+        Disable-WindowsOptionalFeature -FeatureName "Recall" -Online -NoRestart | Out-Null
+    } else {
+        Write-Status "Recall feature already disabled"
+    }
+}
+
 if ($options["RemoveWidgets"]) {
     Write-Status "Removing Widgets..."
-    winget uninstall "windows web experience pack" --accept-source-agreements
+    winget uninstall "Windows Web Experience Pack" --accept-source-agreements
 }
 
 if ($options["RemoveOneDrive"]) {
@@ -258,15 +288,6 @@ if ($options["RemoveXboxApps"]) {
     
     foreach ($app in $xboxApps) {
         winget uninstall $app --accept-source-agreements
-    }
-}
-
-if ($options["RemoveCopilot"]) {
-    Write-Status "Removing Copilot..."
-    try {
-        Get-AppxPackage -AllUsers -Name Microsoft.Copilot | Remove-AppxPackage
-    } catch {
-        Write-Host "Error removing Copilot: $_" -ForegroundColor Yellow
     }
 }
 
@@ -372,6 +393,10 @@ if ($options["RemoveBloatware"]) {
     Write-Status "Bloatware removal completed"
 }
 
+
+########################################
+# Final action
+########################################
 # Refresh Explorer
 Write-Status "Refreshing Explorer to apply changes..."
 Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue
