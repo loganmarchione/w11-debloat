@@ -48,7 +48,7 @@ function Invoke-RegCommand {
     }
 }
 
-function Create-LogoutShortcutOnPublicDesktop {
+function New-LogoutShortcutOnPublicDesktop {
     Write-Status "Creating logout shortcut on all users' desktops..."
 
     # Create shortcut on Public desktop (visible to all users)
@@ -112,7 +112,7 @@ $options = @{
     "HideFrequentFolders"      = $true   # Hide frequently used folders
     "HideOfficeFiles"          = $true   # Hide files from Office.com
     "RestoreContextMenu"       = $true   # Restore classic context menu
-    "CreateLogoutShortcut"     = $true   # Create logout shortcut on public desktop
+    "NewLogoutShortcut"        = $true   # Create logout shortcut on public desktop
     
     # Start Menu
     "HideRecentlyAddedApps"    = $true   # Hide recently added apps
@@ -401,8 +401,8 @@ if ($options["RestoreContextMenu"]) {
     }
 }
 
-if ($options["CreateLogoutShortcut"]) {
-    Create-LogoutShortcutOnPublicDesktop
+if ($options["NewLogoutShortcut"]) {
+    New-LogoutShortcutOnPublicDesktop
 }
 
 ########################################
