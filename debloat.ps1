@@ -21,9 +21,10 @@ function Test-Windows11 {
 
     if ($Major -lt 11) {
         Write-Status "This script is designed for Windows 11. Current OS version: Windows $Major" -ForegroundColor Red
-        return $false
+        Exit 1
     }
-    return $true
+
+    Write-Status "Windows 11 detected - continuing with script"
 }
 
 function Test-AdminPrivileges {
@@ -63,10 +64,7 @@ $logFile = "$env:USERPROFILE\Desktop\Windows11_Debloat_Log.txt"
 Start-Transcript -Path $logFile -Force
 
 # Check for Windows 11
-if (-not (Test-Windows11)) {
-    Write-Status "Exiting script as this is not Windows 11." -ForegroundColor Red
-    Exit 1
-}
+Test-Windows11
 
 # Check for admin privileges
 Test-AdminPrivileges
