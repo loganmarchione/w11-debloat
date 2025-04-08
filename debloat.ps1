@@ -17,7 +17,7 @@ function Test-Windows11 {
         $Major = 11
     }
     $OSVersion = [System.Version]::new($Major, $info.Minor, $info.Build)
-    Write-Status ("Windows Version: {0}.{1}.{2}" -f $OSVersion.Major, $OSVersion.Minor, $OSVersion.Build) -ForegroundColor Yellow
+    Write-Status ("Windows Version: {0}.{1}.{2}" -f $OSVersion.Major, $OSVersion.Minor, $OSVersion.Build)
 
     if ($Major -lt 11) {
         Write-Status "This script is designed for Windows 11. Current OS version: Windows $Major" -ForegroundColor Red
@@ -277,15 +277,9 @@ if ($options["RemoveBloatware"]) {
         "Microsoft.windowscommunicationsapps"
         "MicrosoftTeams*"
     )
-
-    $removedCount = 0
-    $totalCount = $Bloatware.Count
     
     foreach ($Bloat in $Bloatware) {
-        $removedCount++
-        $percentComplete = [math]::Round(($removedCount / $totalCount) * 100)
-        Write-Progress -Activity "Removing Bloatware" -Status "$Bloat" -PercentComplete $percentComplete
-        
+        Write-Status "Removing $Bloat..."
         try {
             Get-AppxPackage -AllUsers -Name $Bloat -ErrorAction SilentlyContinue | Remove-AppxPackage -ErrorAction SilentlyContinue
             Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
@@ -294,7 +288,6 @@ if ($options["RemoveBloatware"]) {
         }
     }
     
-    Write-Progress -Activity "Removing Bloatware" -Completed
     Write-Status "Bloatware removal completed"
 }
 
