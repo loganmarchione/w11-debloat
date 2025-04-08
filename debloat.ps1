@@ -81,7 +81,16 @@ $options = @{
     "DisableHibernation"       = $true   # Disable hibernation
     "SetDateFormat"            = $true   # Set date format to yyyy-MM-dd
     "EnableDarkTheme"          = $true   # Enable dark theme
-    
+
+    # App Removal
+    "DisableRecall"            = $true   # Disable Recall feature
+    "RemoveOneDrive"           = $true   # Remove OneDrive
+    "RemoveBingSearch"         = $true   # Remove Bing Search
+    "RemovePowerAutomate"      = $true   # Remove PowerAutomate
+    "RemoveXboxApps"           = $true   # Remove Xbox apps
+    "RemoveWidgets"            = $true   # Remove widgets
+    "RemoveBloatware"          = $true   # Remove bloatware
+
     # Explorer settings
     "ShowFileExtensions"       = $true   # Show file extensions
     "ShowHiddenFiles"          = $true   # Show hidden files
@@ -101,15 +110,6 @@ $options = @{
     "AlignTaskbarLeft"         = $true   # Align taskbar to the left
     "HideSearchBox"            = $true   # Hide search box
     "HideTaskViewButton"       = $true   # Hide Task View button
-    
-    # App Removal
-    "DisableRecall"            = $true   # Disable Recall feature
-    "RemoveWidgets"            = $true   # Remove widgets
-    "RemoveOneDrive"           = $true   # Remove OneDrive
-    "RemoveBingSearch"         = $true   # Remove Bing Search
-    "RemovePowerAutomate"      = $true   # Remove PowerAutomate
-    "RemoveXboxApps"           = $true   # Remove Xbox apps
-    "RemoveBloatware"          = $true   # Remove all bloatware
     
     # Final Action
     "RestartComputer"          = $false  # Restart computer when done
@@ -150,101 +150,6 @@ if ($options["EnableDarkTheme"]) {
 }
 
 ########################################
-# Explorer settings
-########################################
-if ($options["ShowFileExtensions"]) {
-    Write-Status "Showing file extensions..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "HideFileExt" /t REG_DWORD /d 0 /f'
-}
-
-if ($options["ShowHiddenFiles"]) {
-    Write-Status "Showing hidden files..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Hidden" /t REG_DWORD /d 1 /f'
-}
-
-if ($options["HideSyncNotifications"]) {
-    Write-Status "Hiding sync provider notifications..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowSyncProviderNotifications" /t REG_DWORD /d 0 /f'
-}
-
-if ($options["OpenToThisPC"]) {
-    Write-Status "Setting File Explorer to open to This PC..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "LaunchTo" /t REG_DWORD /d 1 /f'
-}
-
-if ($options["HideRecentFiles"]) {
-    Write-Status "Hiding recently used files..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowRecent" /t REG_DWORD /d 0 /f'
-}
-
-if ($options["HideFrequentFolders"]) {
-    Write-Status "Hiding frequently used folders..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowFrequent" /t REG_DWORD /d 0 /f'
-}
-
-if ($options["HideOfficeFiles"]) {
-    Write-Status "Hiding files from Office.com..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowCloudFilesInQuickAccess" /t REG_DWORD /d 0 /f'
-}
-
-if ($options["RestoreContextMenu"]) {
-    Write-Status "Restoring classic context menu..."
-    try {
-        # Direct registry approach instead of using reg.exe
-        if (-not (Test-Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}")) {
-            New-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" -Force | Out-Null
-        }
-        
-        if (-not (Test-Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32")) {
-            New-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" -Force | Out-Null
-        }
-        
-        # Set the default value to empty string
-        Set-ItemProperty -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" -Name "(Default)" -Value "" -Force
-        
-        Write-Status "Classic context menu restored successfully."
-    } catch {
-        Write-Status "Error restoring classic context menu: $_" -ForegroundColor Red
-    }
-}
-
-########################################
-# Start Menu
-########################################
-if ($options["HideRecentlyAddedApps"]) {
-    Write-Status "Hiding recently added apps..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "HideRecentlyAddedApps" /t REG_DWORD /d 1 /f'
-}
-
-if ($options["HideRecentlyOpenedItems"]) {
-    Write-Status "Hiding recently opened items..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_TrackDocs" /t REG_DWORD /d 0 /f'
-}
-
-if ($options["HideRecommendations"]) {
-    Write-Status "Hiding recommendations..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_IrisRecommendations" /t REG_DWORD /d 0 /f'
-}
-
-########################################
-# Taskbar
-########################################
-if ($options["AlignTaskbarLeft"]) {
-    Write-Status "Aligning taskbar to the left..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarAl" /t REG_DWORD /d 0 /f'
-}
-
-if ($options["HideSearchBox"]) {
-    Write-Status "Hiding search box..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search" /v "SearchboxTaskbarMode" /t REG_DWORD /d 0 /f'
-}
-
-if ($options["HideTaskViewButton"]) {
-    Write-Status "Hiding Task View button..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t REG_DWORD /d 0 /f'
-}
-
-########################################
 # App Removal
 ########################################
 if ($options["DisableRecall"]) {
@@ -255,11 +160,6 @@ if ($options["DisableRecall"]) {
     } else {
         Write-Status "Recall feature already disabled"
     }
-}
-
-if ($options["RemoveWidgets"]) {
-    Write-Status "Removing Widgets..."
-    winget uninstall "Windows Web Experience Pack" --accept-source-agreements
 }
 
 if ($options["RemoveOneDrive"]) {
@@ -289,6 +189,11 @@ if ($options["RemoveXboxApps"]) {
     foreach ($app in $xboxApps) {
         winget uninstall $app --accept-source-agreements
     }
+}
+
+if ($options["RemoveWidgets"]) {
+    Write-Status "Removing Widgets..."
+    winget uninstall "Windows Web Experience Pack" --accept-source-agreements
 }
 
 if ($options["RemoveBloatware"]) {
@@ -393,6 +298,100 @@ if ($options["RemoveBloatware"]) {
     Write-Status "Bloatware removal completed"
 }
 
+########################################
+# Explorer settings
+########################################
+if ($options["ShowFileExtensions"]) {
+    Write-Status "Showing file extensions..."
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "HideFileExt" /t REG_DWORD /d 0 /f'
+}
+
+if ($options["ShowHiddenFiles"]) {
+    Write-Status "Showing hidden files..."
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Hidden" /t REG_DWORD /d 1 /f'
+}
+
+if ($options["HideSyncNotifications"]) {
+    Write-Status "Hiding sync provider notifications..."
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowSyncProviderNotifications" /t REG_DWORD /d 0 /f'
+}
+
+if ($options["OpenToThisPC"]) {
+    Write-Status "Setting File Explorer to open to This PC..."
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "LaunchTo" /t REG_DWORD /d 1 /f'
+}
+
+if ($options["HideRecentFiles"]) {
+    Write-Status "Hiding recently used files..."
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowRecent" /t REG_DWORD /d 0 /f'
+}
+
+if ($options["HideFrequentFolders"]) {
+    Write-Status "Hiding frequently used folders..."
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowFrequent" /t REG_DWORD /d 0 /f'
+}
+
+if ($options["HideOfficeFiles"]) {
+    Write-Status "Hiding files from Office.com..."
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShowCloudFilesInQuickAccess" /t REG_DWORD /d 0 /f'
+}
+
+if ($options["RestoreContextMenu"]) {
+    Write-Status "Restoring classic context menu..."
+    try {
+        # Direct registry approach instead of using reg.exe
+        if (-not (Test-Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}")) {
+            New-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" -Force | Out-Null
+        }
+
+        if (-not (Test-Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32")) {
+            New-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" -Force | Out-Null
+        }
+
+        # Set the default value to empty string
+        Set-ItemProperty -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" -Name "(Default)" -Value "" -Force
+
+        Write-Status "Classic context menu restored successfully."
+    } catch {
+        Write-Status "Error restoring classic context menu: $_" -ForegroundColor Red
+    }
+}
+
+########################################
+# Start Menu
+########################################
+if ($options["HideRecentlyAddedApps"]) {
+    Write-Status "Hiding recently added apps..."
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "HideRecentlyAddedApps" /t REG_DWORD /d 1 /f'
+}
+
+if ($options["HideRecentlyOpenedItems"]) {
+    Write-Status "Hiding recently opened items..."
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_TrackDocs" /t REG_DWORD /d 0 /f'
+}
+
+if ($options["HideRecommendations"]) {
+    Write-Status "Hiding recommendations..."
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_IrisRecommendations" /t REG_DWORD /d 0 /f'
+}
+
+########################################
+# Taskbar
+########################################
+if ($options["AlignTaskbarLeft"]) {
+    Write-Status "Aligning taskbar to the left..."
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarAl" /t REG_DWORD /d 0 /f'
+}
+
+if ($options["HideSearchBox"]) {
+    Write-Status "Hiding search box..."
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search" /v "SearchboxTaskbarMode" /t REG_DWORD /d 0 /f'
+}
+
+if ($options["HideTaskViewButton"]) {
+    Write-Status "Hiding Task View button..."
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t REG_DWORD /d 0 /f'
+}
 
 ########################################
 # Final action
