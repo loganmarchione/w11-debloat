@@ -48,6 +48,24 @@ function Invoke-RegCommand {
     }
 }
 
+function Create-LogoutShortcutOnPublicDesktop {
+    Write-Status "Creating logout shortcut on all users' desktops..."
+
+    # Create shortcut on Public desktop (visible to all users)
+    $PublicDesktop = "$env:Public\Desktop"
+    $ShortcutFile = "$PublicDesktop\Logout.lnk"
+
+    $TargetFile = "$env:SystemRoot\System32\logoff.exe"
+    $WScriptShell = New-Object -ComObject WScript.Shell
+    $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+    $Shortcut.TargetPath = $TargetFile
+    $Shortcut.Description = "Log out of Windows"
+    $Shortcut.IconLocation = "shell32.dll,27" # Logoff icon
+    $Shortcut.Save()
+
+    Write-Status "Logout shortcut created at: $ShortcutFile" -ForegroundColor Green
+}
+
 ################################################################################
 # Script starts here
 ################################################################################
@@ -94,6 +112,7 @@ $options = @{
     "HideFrequentFolders"      = $true   # Hide frequently used folders
     "HideOfficeFiles"          = $true   # Hide files from Office.com
     "RestoreContextMenu"       = $true   # Restore classic context menu
+    "CreateLogoutShortcut"     = $true   # Create logout shortcut on public desktop
     
     # Start Menu
     "HideRecentlyAddedApps"    = $true   # Hide recently added apps
@@ -115,16 +134,19 @@ $options = @{
 if ($options["SetRegion"]) {
     Write-Status "Setting region to US..."
     Set-WinHomeLocation -GeoID 244
+    # Can see current setting by running: Get-WinHomeLocation
 }
 
 if ($options["SetTimezone"]) {
     Write-Status "Setting timezone to Eastern Standard Time..."
     Set-TimeZone -Name "Eastern Standard Time"
+    # Can see current setting by running: Get-TimeZone
 }
 
 if ($options["SetCulture"]) {
     Write-Status "Setting culture to en-US..."
     Set-Culture -CultureInfo en-US
+    # Can see current setting by running: Get-Culture
 }
 
 if ($options["DisableHibernation"]) {
@@ -377,6 +399,10 @@ if ($options["RestoreContextMenu"]) {
     } catch {
         Write-Status "Error restoring classic context menu: $_" -ForegroundColor Red
     }
+}
+
+if ($options["CreateLogoutShortcut"]) {
+    Create-LogoutShortcutOnPublicDesktop
 }
 
 ########################################
