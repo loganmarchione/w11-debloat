@@ -97,6 +97,8 @@ $options = @{
     # App Removal
     "DisableRecall"            = $true   # Disable Recall feature
     "RemoveOneDrive"           = $true   # Remove OneDrive
+    "RemoveBingSearch"         = $true   # Remove Bing Search
+    "RemovePowerAutomate"      = $true   # Remove PowerAutomate
     "RemoveXboxApps"           = $true   # Remove Xbox apps
     "RemoveWidgets"            = $true   # Remove widgets
     "RemoveBloatware"          = $true   # Remove bloatware
@@ -218,6 +220,16 @@ if ($options["RemoveOneDrive"]) {
     }
 }
 
+if ($options["RemoveBingSearch"]) {
+    Write-Status "Removing Bing Search..."
+    winget uninstall "Microsoft.BingSearch_8wekyb3d8bbwe" --accept-source-agreements
+}
+
+if ($options["RemovePowerAutomate"]) {
+    Write-Status "Removing PowerAutomate..."
+    winget uninstall "Microsoft.PowerAutomateDesktop_8wekyb3d8bbwe" --accept-source-agreements
+}
+
 if ($options["RemoveXboxApps"]) {
     Write-Status "Removing Xbox Apps..."
     $xboxApps = @(
@@ -282,7 +294,6 @@ if ($options["RemoveBloatware"]) {
         "Microsoft.BingFinance"
         "Microsoft.BingHealthAndFitness"
         "Microsoft.BingNews"
-        "Microsoft.BingSearch_8wekyb3d8bbwe"
         "Microsoft.BingSports"
         "Microsoft.BingTravel"
         "Microsoft.BingTranslator"
@@ -303,7 +314,6 @@ if ($options["RemoveBloatware"]) {
         "Microsoft.OneConnect"
         "Microsoft.OneDriveSync"
         "Microsoft.People"
-        "Microsoft.PowerAutomateDesktop_8wekyb3d8bbwe"
         "Microsoft.Print3D"
         "Microsoft.ScreenSketch"
         "Microsoft.SkypeApp"
