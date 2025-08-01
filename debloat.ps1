@@ -220,16 +220,6 @@ if ($options["RemoveOneDrive"]) {
     }
 }
 
-if ($options["RemoveBingSearch"]) {
-    Write-Status "Removing Bing Search..."
-    winget uninstall "Microsoft.BingSearch_8wekyb3d8bbwe" --accept-source-agreements
-}
-
-if ($options["RemovePowerAutomate"]) {
-    Write-Status "Removing PowerAutomate..."
-    winget uninstall "Microsoft.PowerAutomateDesktop_8wekyb3d8bbwe" --accept-source-agreements
-}
-
 if ($options["RemoveXboxApps"]) {
     Write-Status "Removing Xbox Apps..."
     $xboxApps = @(
@@ -340,7 +330,13 @@ if ($options["RemoveBloatware"]) {
             # Continue even if there's an error
         }
     }
-    
+
+    # Apparently these two can only be removed with winget, not the script above
+    Write-Status "Removing Bing Search..."
+    winget uninstall "Microsoft.BingSearch_8wekyb3d8bbwe" --accept-source-agreements
+    Write-Status "Removing PowerAutomate..."
+    winget uninstall "Microsoft.PowerAutomateDesktop_8wekyb3d8bbwe" --accept-source-agreements
+
     Write-Status "Bloatware removal completed"
 }
 
