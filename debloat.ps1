@@ -226,13 +226,13 @@ if ($options["RemoveXboxApps"]) {
     )
     
     foreach ($app in $xboxApps) {
-        winget uninstall $app --accept-source-agreements --accept-package-agreements
+        winget uninstall $app --accept-source-agreements
     }
 }
 
 if ($options["RemoveWidgets"]) {
     Write-Status "Removing Widgets..."
-    winget uninstall "Windows Web Experience Pack" --accept-source-agreements --accept-package-agreements
+    winget uninstall "Windows Web Experience Pack" --accept-source-agreements
 }
 
 if ($options["RemoveBloatware"]) {
