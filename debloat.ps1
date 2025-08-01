@@ -125,7 +125,7 @@ $options = @{
     "HideTaskViewButton"       = $true   # Hide Task View button
     
     # Final Action
-    "RestartComputer"          = $false  # Restart computer when done
+    "RestartComputer"          = $true  # Restart computer when done
 }
 
 ########################################
