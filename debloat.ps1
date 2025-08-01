@@ -237,6 +237,9 @@ if ($options["RemoveXboxApps"]) {
 if ($options["RemoveWidgets"]) {
     Write-Status "Removing Widgets..."
     winget uninstall "Windows Web Experience Pack" --accept-source-agreements
+    Invoke-RegCommand 'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\NewsAndInterests" /v "AllowNewsAndInterests" /t REG_DWORD /d 0 /f'
+    Invoke-RegCommand 'reg add "HKLM\Software\Policies\Microsoft\Dsh" /v "AllowNewsAndInterests" /t REG_DWORD /d 0 /f'
+
 }
 
 if ($options["RemoveBloatware"]) {
