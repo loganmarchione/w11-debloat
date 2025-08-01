@@ -125,7 +125,7 @@ $options = @{
     "HideTaskViewButton"       = $true   # Hide Task View button
     
     # Final Action
-    "RestartComputer"          = $false  # Restart computer when done
+    "RestartComputer"          = $true  # Restart computer when done
 }
 
 ########################################
@@ -180,6 +180,8 @@ if ($options["DisableRecall"]) {
 
 Write-Status "Updating Winget sources..."
 winget source update
+# Need to do this accept the terms to use the MS Store
+winget list --accept-source-agreements | Out-Null
 
 if ($options["RemoveOneDrive"]) {
     Write-Status "Removing OneDrive..."
@@ -218,16 +220,6 @@ if ($options["RemoveOneDrive"]) {
     }
 }
 
-if ($options["RemoveBingSearch"]) {
-    Write-Status "Removing Bing Search..."
-    winget uninstall "Microsoft.BingSearch_8wekyb3d8bbwe" --accept-source-agreements
-}
-
-if ($options["RemovePowerAutomate"]) {
-    Write-Status "Removing PowerAutomate..."
-    winget uninstall "Microsoft.PowerAutomateDesktop_8wekyb3d8bbwe" --accept-source-agreements
-}
-
 if ($options["RemoveXboxApps"]) {
     Write-Status "Removing Xbox Apps..."
     $xboxApps = @(
@@ -245,6 +237,9 @@ if ($options["RemoveXboxApps"]) {
 if ($options["RemoveWidgets"]) {
     Write-Status "Removing Widgets..."
     winget uninstall "Windows Web Experience Pack" --accept-source-agreements
+    Invoke-RegCommand 'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\NewsAndInterests" /v "AllowNewsAndInterests" /t REG_DWORD /d 0 /f'
+    Invoke-RegCommand 'reg add "HKLM\Software\Policies\Microsoft\Dsh" /v "AllowNewsAndInterests" /t REG_DWORD /d 0 /f'
+
 }
 
 if ($options["RemoveBloatware"]) {
@@ -338,7 +333,13 @@ if ($options["RemoveBloatware"]) {
             # Continue even if there's an error
         }
     }
-    
+
+    # Apparently these two can only be removed with winget, not the script above
+    Write-Status "Removing Bing Search..."
+    winget uninstall "Microsoft.BingSearch_8wekyb3d8bbwe" --accept-source-agreements
+    Write-Status "Removing PowerAutomate..."
+    winget uninstall "Microsoft.PowerAutomateDesktop_8wekyb3d8bbwe" --accept-source-agreements
+
     Write-Status "Bloatware removal completed"
 }
 
