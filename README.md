@@ -1,5 +1,7 @@
 # w11-debloat
 
+[![Lint PowerShell](https://github.com/loganmarchione/w11-debloat/actions/workflows/main.yml/badge.svg)](https://github.com/loganmarchione/w11-debloat/actions/workflows/main.yml)
+
 ## Explanation
 
 A first-pass at de-bloating Windows 11
