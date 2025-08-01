@@ -178,6 +178,8 @@ if ($options["DisableRecall"]) {
 
 Write-Status "Updating Winget sources..."
 winget source update
+# Need to do this accept the terms to use the MS Store
+winget list --accept-source-agreements | Out-Null
 
 if ($options["RemoveOneDrive"]) {
     Write-Status "Removing OneDrive..."
