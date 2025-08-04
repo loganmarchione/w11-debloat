@@ -112,7 +112,7 @@ if ($options["RemoveWidgets"]) {
 if ($options["RemoveBloatware"]) {
     Write-Status "Removing bloatware apps..."
     
-    $Bloatware = @(
+    $apps = @(
         "*ACGMediaPlayer*"
         "*ActiproSoftwareLLC*"
         "*AdobePhotoshopExpress*"
@@ -191,11 +191,11 @@ if ($options["RemoveBloatware"]) {
         "MicrosoftTeams*"
     )
     
-    foreach ($Bloat in $Bloatware) {
-        Write-Status "Removing $Bloat..."
+    foreach ($app in $apps) {
+        Write-Status "Removing $app..."
         try {
-            Get-AppxPackage -AllUsers -Name $Bloat -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
-            Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -AllUsers -Online -ErrorAction SilentlyContinue
+            Get-AppxPackage -AllUsers -Name $app -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
+            Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $app | Remove-AppxProvisionedPackage -AllUsers -Online -ErrorAction SilentlyContinue
         } catch {
             # Continue even if there's an error
         }

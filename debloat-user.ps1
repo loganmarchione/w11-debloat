@@ -99,14 +99,14 @@ if ($options["EnableDarkTheme"]) {
 ########################################
 if ($options["RemoveXboxApps"]) {
     Write-Status "Removing Xbox Apps..."
-    $xboxApps = @(
+    $apps = @(
         "Microsoft.GamingApp_8wekyb3d8bbwe",
         "Microsoft.Xbox.TCUI_8wekyb3d8bbwe",
         "Microsoft.XboxIdentityProvider_8wekyb3d8bbwe",
         "Microsoft.XboxSpeechToTextOverlay_8wekyb3d8bbwe"
     )
     
-    foreach ($app in $xboxApps) {
+    foreach ($app in $apps) {
         winget uninstall $app --accept-source-agreements
     }
 }
@@ -114,9 +114,15 @@ if ($options["RemoveXboxApps"]) {
 if ($options["RemoveBloatware"]) {
     Write-Status "Removing bloatware apps..."
     # Apparently these can only be removed with winget
-    winget uninstall "Microsoft.BingSearch_8wekyb3d8bbwe" --accept-source-agreements
-    winget uninstall "Microsoft.PowerAutomateDesktop_8wekyb3d8bbwe" --accept-source-agreements
-    winget uninstall "Windows Web Experience Pack" --accept-source-agreements
+    $apps = @(
+        "Microsoft.BingSearch_8wekyb3d8bbwe",
+        "Microsoft.PowerAutomateDesktop_8wekyb3d8bbwe",
+        "Windows Web Experience Pack"
+    )
+
+    foreach ($app in $apps) {
+        winget uninstall $app --accept-source-agreements
+    }
 }
 
 ########################################
