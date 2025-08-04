@@ -11,7 +11,7 @@ Start-Transcript -Path $logFile -Force
 
 # Download and execute helper functions
 try {
-    $helpersUrl = "https://raw.githubusercontent.com/loganmarchione/w11-debloat/split/functions.ps1"
+    $helpersUrl = "https://raw.githubusercontent.com/loganmarchione/w11-debloat/refs/heads/split/functions.ps1"
     $helpersScript = Invoke-WebRequest -UseBasicParsing -Uri $helpersUrl
     Invoke-Expression $helpersScript.Content
     Write-Status "Helper functions loaded successfully"
