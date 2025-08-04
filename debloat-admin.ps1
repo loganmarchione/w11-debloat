@@ -97,7 +97,7 @@ if ($options["RemoveOneDrive"]) {
         Invoke-RegCommand 'reg add "HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f'
         Invoke-RegCommand 'reg add "HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f'
 
-        Write-Status "OneDrive removal completed" -ForegroundColor Green
+        Write-Status "OneDrive removal completed"
     } catch {
         Write-Status "Error removing OneDrive: $_" -ForegroundColor Red
     }
