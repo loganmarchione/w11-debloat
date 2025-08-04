@@ -38,7 +38,12 @@ function Test-AdminPrivilege {
 function Invoke-RegCommand {
     param([string]$Command)
     try {
-        Invoke-Expression "cmd /c $Command" | Out-Null
+        $result = Invoke-Expression "cmd /c $Command 2>&1"
+        if ($LASTEXITCODE -ne 0) {
+            Write-Status "Error executing: $Command" -ForegroundColor Red
+            Write-Status "Output: $result" -ForegroundColor Red
+            return $false
+        }
         return $true
     }
     catch {
