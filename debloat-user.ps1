@@ -140,7 +140,7 @@ if ($options["ShowHiddenFiles"]) {
 
 if ($options["HideSyncNotifications"]) {
     Write-Status "Hiding sync provider notifications..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowSyncProviderNotifications" /t REG_DWORD /d 0 /f'
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowSyncProviderNotifications" /t REG_DWORD /d 0 /f'
 }
 
 if ($options["OpenToThisPC"]) {
