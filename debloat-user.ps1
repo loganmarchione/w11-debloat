@@ -9,13 +9,6 @@ $ErrorActionPreference = "Stop"
 $logFile = "$env:USERPROFILE\Desktop\Windows11_Debloat_Log.txt"
 Start-Transcript -Path $logFile -Force
 
-# Check for Windows 11
-Test-Windows11
-
-# Check for admin privileges
-# Test-AdminPrivilege
-# Write-Status "Administrator privileges confirmed"
-
 # Download and execute helper functions
 try {
     $helpersUrl = "https://raw.githubusercontent.com/loganmarchione/w11-debloat/split/functions.ps1"
@@ -26,6 +19,13 @@ try {
     Write-Host "Failed to load helper functions: $_" -ForegroundColor Red
     Exit 1
 }
+
+# Check for Windows 11
+Test-Windows11
+
+# Check for admin privileges
+# Test-AdminPrivilege
+# Write-Status "Administrator privileges confirmed"
 
 Update-WingetSources
 
