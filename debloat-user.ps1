@@ -117,6 +117,7 @@ if ($options["RemoveBloatware"]) {
     winget uninstall "Microsoft.BingSearch_8wekyb3d8bbwe" --accept-source-agreements
     winget uninstall "Microsoft.PowerAutomateDesktop_8wekyb3d8bbwe" --accept-source-agreements
     winget uninstall "Windows Web Experience Pack" --accept-source-agreements
+}
 
 ########################################
 # Explorer settings
