@@ -39,6 +39,7 @@ $options = @{
     "EnableDarkTheme"          = $true   # Enable dark theme
 
     # App removal
+    "RemoveOneDrive"           = $true   # Remove OneDrive
     "RemoveXboxApps"           = $true   # Remove Xbox apps
     "RemoveBloatware"          = $true   # Remove bloatware
 
@@ -97,6 +98,10 @@ if ($options["EnableDarkTheme"]) {
 ########################################
 # App Removal
 ########################################
+if ($options["RemoveOneDrive"]) {
+    Remove-OneDrive
+}
+
 if ($options["RemoveXboxApps"]) {
     Write-Status "Removing Xbox Apps..."
     $apps = @(
@@ -113,6 +118,21 @@ if ($options["RemoveXboxApps"]) {
 
 if ($options["RemoveBloatware"]) {
     Write-Status "Removing bloatware apps..."
+
+    $apps = @(
+        "Microsoft.Copilot"
+    )
+
+    foreach ($app in $apps) {
+        Write-Status "Removing $app..."
+        try {
+            Get-AppxPackage -Name $app -ErrorAction SilentlyContinue | Remove-AppxPackage -ErrorAction SilentlyContinue
+            Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $app | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
+        } catch {
+            # Continue even if there's an error
+        }
+    }
+
     # Apparently these can only be removed with winget
     $apps = @(
         "Microsoft.BingSearch_8wekyb3d8bbwe",

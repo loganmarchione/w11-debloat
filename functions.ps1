@@ -85,3 +85,33 @@ function Restart-Explorer {
     Start-Sleep -Seconds 1
     Start-Process explorer
 }
+
+function Remove-OneDrive {
+    Write-Status "Removing OneDrive..."
+
+    # Try to terminate OneDrive process if running
+    Get-Process -Name "OneDrive" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+
+    # Try multiple methods to uninstall OneDrive
+    try {
+        # Run the OneDrive uninstaller directly
+        if (Test-Path "$env:SystemRoot\SysWOW64\OneDriveSetup.exe") {
+            Write-Status "Running OneDrive uninstaller (64-bit)..."
+            & "$env:SystemRoot\SysWOW64\OneDriveSetup.exe" /uninstall
+        } elseif (Test-Path "$env:SystemRoot\System32\OneDriveSetup.exe") {
+            Write-Status "Running OneDrive uninstaller (32-bit)..."
+            & "$env:SystemRoot\System32\OneDriveSetup.exe" /uninstall
+        }
+
+        # Wait for the uninstaller to complete
+        Start-Sleep -Seconds 5
+
+        # Remove leftover OneDrive folder if it exists
+        if (Test-Path "$env:USERPROFILE\OneDrive") {
+            Write-Status "Removing OneDrive folder..."
+            Remove-Item -Path "$env:USERPROFILE\OneDrive" -Force -Recurse -ErrorAction SilentlyContinue
+        }
+    } catch {
+        Write-Status "Error removing OneDrive: $_" -ForegroundColor Red
+    }
+}
