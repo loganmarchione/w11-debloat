@@ -168,7 +168,7 @@ if ($options["HideOfficeFiles"]) {
 ########################################
 if ($options["HideRecentlyAddedApps"]) {
     Write-Status "Hiding recently added apps..."
-    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "HideRecentlyAddedApps" /t REG_DWORD /d 1 /f'
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Start" /v "ShowRecentList" /t REG_DWORD /d 0 /f'
 }
 
 if ($options["HideRecentlyOpenedItems"]) {
