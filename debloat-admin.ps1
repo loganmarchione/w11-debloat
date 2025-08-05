@@ -65,6 +65,9 @@ if ($options["DisableRecall"]) {
     } else {
         Write-Status "Recall feature already disabled"
     }
+
+    Invoke-RegCommand 'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsAI" /v "DisableAIDataAnalysis" /t REG_DWORD /d 1 /f'
+    Invoke-RegCommand 'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsAI" /v "AllowRecallEnablement" /t REG_DWORD /d 0 /f'
 }
 
 if ($options["DisableNotepadAI"]) {

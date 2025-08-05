@@ -39,6 +39,7 @@ $options = @{
     "EnableDarkTheme"          = $true   # Enable dark theme
 
     # App removal
+    "DisableRecall"            = $true   # Disable Recall feature
     "RemoveOneDrive"           = $true   # Remove OneDrive
     "RemoveXboxApps"           = $true   # Remove Xbox apps
     "RemoveBloatware"          = $true   # Remove bloatware
@@ -98,6 +99,10 @@ if ($options["EnableDarkTheme"]) {
 ########################################
 # App Removal
 ########################################
+if ($options["DisableRecall"]) {
+    Invoke-RegCommand 'reg add "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\WindowsAI" /v "DisableAIDataAnalysis" /t REG_DWORD /d 1 /f'
+}
+
 if ($options["RemoveOneDrive"]) {
     Remove-OneDrive
 }
