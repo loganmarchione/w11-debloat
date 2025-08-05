@@ -36,6 +36,7 @@ $options = @{
 
     # App Removal
     "DisableRecall"            = $true   # Disable Recall feature
+    "DisableNotepadAI"         = $true   # Disable Notepad AI features
     "RemoveOneDrive"           = $true   # Remove OneDrive
     "RemoveWidgets"            = $true   # Remove widgets
     "RemoveBloatware"          = $true   # Remove bloatware
@@ -64,6 +65,11 @@ if ($options["DisableRecall"]) {
     } else {
         Write-Status "Recall feature already disabled"
     }
+}
+
+if ($options["DisableNotepadAI"]) {
+    Write-Status "Disabling Notepad AI features..."
+    Invoke-RegCommand 'reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\WindowsNotepad" /v "DisableAIFeatures" /t REG_DWORD /d 1 /f'
 }
 
 if ($options["RemoveOneDrive"]) {
