@@ -12,5 +12,14 @@ A first-pass at de-bloating Windows 11
 2. Copy/paste the command below
 
 ```
-powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest -UseBasicParsing https://raw.githubusercontent.com/loganmarchione/w11-debloat/refs/heads/main/debloat.ps1 | Invoke-Expression"
+powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest -UseBasicParsing https://raw.githubusercontent.com/loganmarchione/w11-debloat/refs/heads/main/debloat-admin.ps1 | Invoke-Expression"
 ```
+
+3. Open a regular terminal session
+4. Copy/paste the command below
+
+```
+powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest -UseBasicParsing https://raw.githubusercontent.com/loganmarchione/w11-debloat/refs/heads/main/debloat-user.ps1 | Invoke-Expression"
+```
+
+Repeat steps 3-4 for each regular (non-admin) user on the system
