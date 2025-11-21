@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Check out the codebase
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Run PSScriptAnalyzer on PowerShell Scripts
         shell: pwsh
